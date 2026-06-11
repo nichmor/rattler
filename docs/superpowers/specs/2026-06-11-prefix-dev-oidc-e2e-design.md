@@ -162,7 +162,7 @@ Modeled on `e2e-s3-tests.yml`:
 |---|---|---|
 | Harness | Wire the `rattler` CLI + nu script | Matches existing `e2e-s3` pattern; doubles as pixi reference wiring |
 | CI platform | GitHub Actions | rattler's home; `id-token: write` covers the GitHub `ambient-id` detector |
-| Audience | Derived from server host (`for_host`) | Works for beta + prod without hardcoding; audience-binds each credential to its server |
+| Audience | ~~Derived from server host (`for_host`)~~ **Amended during bring-up:** prefix.dev-family hosts (`prefix.dev`, `*.prefix.dev`) use the shared audience `prefix.dev` (`for_server`); other hosts keep the host-derived audience | Beta validates GitHub OIDC tokens against the fixed audience `prefix.dev` at decode time (verified empirically: `InvalidAudience` for `aud=beta.prefix.dev`); the deployed ecosystem convention is one shared audience per prefix.dev family. Host-derived audiences remain for self-hosted servers |
 | Channel scope policy in CLI | `prefix.dev` / `*.prefix.dev` only | Don't volunteer CI identity tokens to arbitrary channel hosts |
 | Provisioning | Full circle: best-effort delete → upload → read each run | Tests both OIDC halves (proactive upload, reactive read) every run |
 | Branch/PR | `auth-challenge-e2e` stacked on #2504, follow-up PR | Keeps the middleware PR focused; e2e can't merge first anyway |
