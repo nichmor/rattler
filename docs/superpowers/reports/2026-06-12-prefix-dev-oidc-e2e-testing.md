@@ -89,6 +89,7 @@ first failing step names the broken component**:
 | 5 | repository-access scope switched to read-write | Step 3 still 403 | scope flip not sufficient |
 | 6 | added Step 2b read probe | **read probe 200**; upload still 403 | the minted token *is* attached to the channel and can read; `/api/v1/upload` denies it — server-side write authorization for pfx-jwt tokens (under investigation on beta) |
 | — | manual anonymous probe from a dev machine | `HTTP/2 401` + `www-authenticate: Bearer realm="beta.prefix.dev"` | **the server fires the challenge** — the premise of the whole design holds on beta |
+| 7 | `skip_upload` dispatch input; Step 5 classifies "no candidates" as auth-success | Steps 1, 4 ✓; Step 5 **AUTH PATH VERIFIED**; run green | **the challenge-reactive read works end to end on real infrastructure** — the pixi#6318 fix is demonstrated; only the upload half remains blocked |
 
 ### Scoreboard
 
@@ -99,7 +100,7 @@ first failing step names the broken component**:
 | Minted token reads the private channel | ✓ proven (run 6, status 200) |
 | Beta challenges anonymous reads with `WWW-Authenticate: Bearer` | ✓ proven (manual probe) |
 | OIDC **upload** via trusted publishing | ✗ blocked — beta returns 403 on `/api/v1/upload` for a token that can read (server-side investigation) |
-| Challenge-reactive read through `rattler create` (Step 5 — the pixi#6318 fix) | ⏳ untested live — blocked behind Step 3; every ingredient proven individually + in-process composed test |
+| Challenge-reactive read through `rattler create` (Step 5 — the pixi#6318 fix) | **✓ proven live** (run 7, `skip_upload` dispatch): with zero stored credentials and anonymous access rejected, `rattler create` fetched the private repodata via challenge → mint → replay; the solve failed only with "no candidates" (test package not yet in the channel), which itself confirms the authenticated download succeeded |
 
 ### Design finding worth keeping
 
